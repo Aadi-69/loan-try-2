@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Prediction</title>
+</head>
+<body>
+    <h2>Enter your details:</h2>
+    <form action="/predict" method="post">
+        <label for="income">Monthly Income:</label>
+        <input type="number" step="0.01" name="income" required><br><br>
+
+        <label for="credit_score">Credit Score:</label>
+        <input type="number" step="0.01" name="credit_score" required><br><br>
+
+        <label for="years_employed">Years Employed:</label>
+        <input type="number" step="0.1" name="years_employed" required><br><br>
+
+        <input type="submit" value="Predict">
+    </form>
+</body>
+</html>
