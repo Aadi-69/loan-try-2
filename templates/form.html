@@ -1,21 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Loan Prediction</title>
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #ece9e6, #ffffff);
+            padding: 50px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        form {
+            display: inline-block;
+            background: #f9f9f9;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        input[type="submit"] {
+            margin-top: 25px;
+            padding: 12px 30px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 480px) {
+            form {
+                width: 90%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Enter your details:</h2>
+    <h1>Loan Approval & Amount Prediction</h1>
     <form action="/predict" method="post">
-        <label for="income">Monthly Income:</label>
-        <input type="number" step="0.01" name="income" required><br><br>
+        <div class="form-group">
+            <label for="income">Monthly Income (₹):</label>
+            <input type="number" step="0.01" name="income" placeholder="e.g., 5000" required>
+        </div>
 
-        <label for="credit_score">Credit Score:</label>
-        <input type="number" step="0.01" name="credit_score" required><br><br>
+        <div class="form-group">
+            <label for="credit_score">Credit Score:</label>
+            <input type="number" step="0.01" name="credit_score" placeholder="e.g., 700" required>
+        </div>
 
-        <label for="years_employed">Years Employed:</label>
-        <input type="number" step="0.1" name="years_employed" required><br><br>
+        <div class="form-group">
+            <label for="years_employed">Years Employed:</label>
+            <input type="number" step="0.1" name="years_employed" placeholder="e.g., 3.5" required>
+        </div>
 
-        <input type="submit" value="Predict">
+        <input type="submit" value="Predict Loan">
     </form>
 </body>
 </html>
