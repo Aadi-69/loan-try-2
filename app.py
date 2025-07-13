@@ -1,31 +1,43 @@
 from flask import Flask, render_template, request
 import pandas as pd
 import joblib
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression, LinearRegression
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import os
 
 app = Flask(__name__)
 
-# Load and preprocess approval data
+# --- Train Loan Approval Model ---
 def train_approval_model():
-    data = pd.read_csv("loan_approval_data.csv")
-    data.fillna(method='ffill', inplace=True)
+    df = pd.read_csv("loan_approval_data.csv")
 
-    le = LabelEncoder()
-    for col in data.select_dtypes(include='object').columns:
-        data[col] = le.fit_transform(data[col])
+    # Encode object columns
+    label_encoders = {}
+    for col in df.select_dtypes(include='object').columns:
+        le = LabelEncoder()
+        df[col] = df[col].astype(str)
+        df[col] = le.fit_transform(df[col])
+        label_encoders[col] = le
 
-    X = data.drop('Loan_Status', axis=1)
-    y = data['Loan_Status']
+    # Save encoders
+    joblib.dump(label_encoders, "label_encoders.joblib")
 
-    model = LogisticRegression()
-    model.fit(X, y)
+    X = df.drop("Loan_Status", axis=1)
+    y = df["Loan_Status"]
 
-    joblib.dump(model, 'approval_model.joblib')
+    # Use SimpleImputer + LogisticRegression in a pipeline
+    pipeline = Pipeline([
+        ('imputer', SimpleImputer(strategy='mean')),
+        ('model', LogisticRegression(max_iter=1000))
+    ])
 
-# Train dummy loan amount model
+    pipeline.fit(X, y)
+    joblib.dump(pipeline, "approval_model.joblib")
+
+
+# --- Train Dummy Loan Amount Model ---
 def train_amount_model():
     dummy_data = pd.DataFrame({
         'income': [4000, 6000, 8000, 3000, 10000],
@@ -40,10 +52,10 @@ def train_amount_model():
     model = LinearRegression()
     model.fit(X, y)
 
-    joblib.dump(model, 'amount_model.joblib')
+    joblib.dump(model, "amount_model.joblib")
 
 
-# Train models if not already trained
+# --- Train Models if Not Exist ---
 if not os.path.exists("approval_model.joblib"):
     train_approval_model()
 
@@ -63,10 +75,10 @@ def predict():
     years_employed = float(request.form['years_employed'])
 
     # Predict loan amount
-    amount_model = joblib.load("amount_model.joblib")
-    predicted_amount = amount_model.predict([[income, credit_score, years_employed]])[0]
+    amt_model = joblib.load("amount_model.joblib")
+    predicted_amount = amt_model.predict([[income, credit_score, years_employed]])[0]
 
-    # Prepare input for approval prediction
+    # Predict approval status
     approval_model = joblib.load("approval_model.joblib")
     features = pd.DataFrame([{
         'Gender': 1,
@@ -82,15 +94,14 @@ def predict():
         'Property_Area': 1
     }])
 
-    approval_prediction = approval_model.predict(features)[0]
-    result = "Approved ✅" if approval_prediction == 1 else "Not Approved ❌"
+    result = approval_model.predict(features)[0]
+    message = "Approved ✅" if result == 1 else "Not Approved ❌"
 
     return f"""
     <h2>Predicted Loan Amount: ₹{predicted_amount:.2f}</h2>
-    <h2>Loan Approval Status: {result}</h2>
+    <h2>Loan Approval Status: {message}</h2>
     <a href='/'>Back</a>
     """
 
 
-# DO NOT run app.run() here — gunicorn will use "app" as entry point
-# This file is ready for `gunicorn app:app`
+# No app.run() — use gunicorn app:app to run this file
