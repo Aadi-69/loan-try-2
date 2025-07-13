@@ -24,8 +24,9 @@ def train_approval_model():
     # Save encoders
     joblib.dump(label_encoders, "label_encoders.joblib")
 
-    X = df.drop("Loan_Status", axis=1)
-    y = df["Loan_Status"]
+    df = df.drop(columns=["Loan_ID"], errors="ignore")
+X = df.drop("Loan_Status", axis=1)
+y = df["Loan_Status"]
 
     # Use SimpleImputer + LogisticRegression in a pipeline
     pipeline = Pipeline([
