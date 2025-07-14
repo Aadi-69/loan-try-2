@@ -2,97 +2,241 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Loan Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Prediction</title>
     <style>
         body {
-            font-family: "Segoe UI", sans-serif;
-            background: linear-gradient(135deg, #ece9e6, #ffffff);
-            padding: 50px;
-            text-align: center;
-        }
-
-        h1 {
+            font-family: 'Arial', sans-serif;
+            background: url('https://miro.medium.com/v2/resize:fit:1100/format:webp/1*ET-nAzkm_kxONk1eeG_5Lg.jpeg') no-repeat center center fixed;
+            background-size: contain; /* Show full image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
             color: #333;
-            margin-bottom: 10px;
+            padding-bottom: 60px; /* Adjust for footer height */
         }
-
-        form {
-            display: inline-block;
-            background: #f9f9f9;
-            padding: 30px 40px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        /* Semi-transparent overlay to improve readability */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(244, 247, 251, 0.75); /* Overlay for readability */
+            z-index: -1;
         }
-
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: 600;
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            width: 100vw; /* Full viewport width */
+            margin: 0; /* Ensure no margins */
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem; /* Font size for header */
+            font-weight: bold;
+        }
+        footer {
+            background-color: #3498db; /* Same color as header */
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            width: 100vw; /* Full viewport width */
+            margin: 0; /* Ensure no margins */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        footer p {
+            margin: 0;
+            font-size: 1rem;
+        }
+        footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 0.5rem;
+            font-weight: bold;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.5); /* Reverted to previous opacity */
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            margin-top: 80px; /* Adjust for header height */
+            margin-bottom: 80px; /* Adjust for footer height */
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
             text-align: left;
         }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: border 0.3s;
-        }
-
-        input[type="number"]:focus {
-            border-color: #007BFF;
-            outline: none;
-        }
-
-        input[type="submit"] {
-            margin-top: 25px;
-            padding: 12px 30px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
             font-weight: bold;
-            font-size: 16px;
-            transition: background 0.3s;
+            color: #34495e;
         }
-
-        input[type="submit"]:hover {
-            background-color: #0056b3;
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
         }
-
-        .form-group {
-            margin-bottom: 15px;
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
         }
-
-        @media (max-width: 480px) {
-            form {
-                width: 90%;
-            }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 5px;
+            display: none;
+        }
+        .result.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .result.error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1>Loan Approval & Amount Prediction</h1>
-    <form action="/predict" method="post">
-        <div class="form-group">
-            <label for="income">Monthly Income (₹):</label>
-            <input type="number" step="0.01" name="income" placeholder="e.g., 5000" required>
-        </div>
+    <header>
+        <h1>Loan Approval & Amount Prediction</h1>
+    </header>
+    <div class="container">
+        <form id="loanForm">
+            <div class="form-group">
+                <label for="income">Monthly Income (₹)</label>
+                <input type="number" id="income" name="income" step="any" required min="0">
+            </div>
+            <div class="form-group">
+                <label for="credit_score">Credit Score</label>
+                <input type="number" id="credit_score" name="credit_score" required min="300" max="850">
+            </div>
+            <div class="form-group">
+                <label for="years_employed">Years Employed</label>
+                <input type="number" id="years_employed" name="years_employed" step="any" required min="0">
+            </div>
+            <button type="submit" id="submitBtn">Predict Loan Approval</button>
+        </form>
+        <div class="loader" id="loader"></div>
+        <div class="result" id="result"></div>
+    </div>
+    <footer>
+        <p>© 2025 Loan Prediction System | Adarsh Pandey</p>
+        <p>
+            <a href="https://github.com/Aadi-69" target="_blank">[GitHub]</a>
+            <a href="http://www.linkedin.com/in/adarsh-undefined-162746330" target="_blank">[LinkedIn]</a>
+        </p>
+    </footer>
 
-        <div class="form-group">
-            <label for="credit_score">Credit Score:</label>
-            <input type="number" step="0.01" name="credit_score" placeholder="e.g., 700" required>
-        </div>
+    <script>
+        document.getElementById('loanForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const resultDiv = document.getElementById('result');
 
-        <div class="form-group">
-            <label for="years_employed">Years Employed:</label>
-            <input type="number" step="0.1" name="years_employed" placeholder="e.g., 3.5" required>
-        </div>
+            // Disable button and show loader
+            submitBtn.disabled = true;
+            loader.style.display = 'block';
+            resultDiv.style.display = 'none';
+            resultDiv.className = 'result';
 
-        <input type="submit" value="Predict Loan">
-    </form>
+            const formData = new FormData(event.target);
+            const data = {
+                income: formData.get('income'),
+                credit_score: formData.get('credit_score'),
+                years_employed: formData.get('years_employed')
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(data).toString()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.text();
+                resultDiv.innerHTML = result;
+                resultDiv.style.display = 'block';
+                resultDiv.classList.add(result.includes('Approved ✅') ? 'success' : 'error');
+            } catch (error) {
+                resultDiv.innerHTML = `<h2>Error: Could not fetch prediction</h2><a href='/'>Back</a>`;
+                resultDiv.style.display = 'block';
+                resultDiv.classList.add('error');
+            } finally {
+                submitBtn.disabled = false;
+                loader.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
